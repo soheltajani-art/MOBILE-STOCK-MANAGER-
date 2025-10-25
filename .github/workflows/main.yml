@@ -1,0 +1,38 @@
+name: Android APK Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Unzip project
+        run: |
+          unzip "MOBILE-STOCK-MANAGER.zip" -d project
+          cd project/android
+          chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: |
+          cd project/android
+          ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MOBILE-STOCK-MANAGER-APK
+          path: project/android/app/build/outputs/apk/debug/app-debug.apk
